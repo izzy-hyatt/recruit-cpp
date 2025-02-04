@@ -40,6 +40,9 @@ class Stats {
 void
 Stats::calculate(const std::vector<int>& data) {
     // Process the input vector and update sum, max, and avg
+    if (data.size() < 1)
+        return;
+    this->max = data[1];
     for (auto num : data) {
         this->sum += num;
         if (num > this->max) {
@@ -49,7 +52,52 @@ Stats::calculate(const std::vector<int>& data) {
     this->avg = (double)this->sum / data.size();
 }
 
+bool unit_test(const int n,
+               const std::vector<int>& data,
+               const int expected_sum,
+               const int expected_max,
+               const double expected_avg) {
+    bool pass = true;
+    Stats s(data);
+    if (s.sum != expected_sum) {
+        std::cerr << "Data sum was not expected value, expected "
+            << expected_sum << " got " << s.sum << std::endl;
+        pass = false;
+    }
+    if (s.max != expected_max) {
+        std::cerr << "Data max was not expected value, expected "
+            << expected_max << " got " << s.max << std::endl;
+        pass = false;
+    }
+    if (s.avg != expected_avg) {
+        std::cerr << "Data avg was not expected value, expected "
+            << expected_avg << " got " << s.avg << std::endl;
+        pass = false;
+    }
+    if (pass) {
+        std::cout << "Test " << n << " passed!" << std::endl;
+    } else {
+        std::cout << "Test " << n << " failed!" << std::endl;
+    }
+    return pass;
+}
+
 int main(int argc, char** argv) {
+    if (argc >= 2 && strcmp(argv[1], "--test") == 0) {
+        std::cout << "Running unit tests:\n" << std::endl;
+        if (!unit_test(1, {}, 0, 0, 0.0))
+            return 1;
+        if (!unit_test(2, {-1, -2, -3}, -6, -1, -2.0))
+            return 1;
+        if (!unit_test(3, {10000, -10000}, 0, 10000, 0.0))
+            return 1;
+        if (!unit_test(4, {0, 0, 0, 0, 0, 0, 0}, 0, 0, 0.0))
+            return 1;
+        if (!unit_test(5, {1, 1, 1, 1, 1, 1, 1}, 7, 1, 1.0))
+            return 1;
+        std::cout << "\nAll tests passed!" << std::endl;
+        return 0;
+    }
     std::vector<int> data;
     // Read integers from stdin into data until EOF or invalid input
     // Exit with appropriate message if input is invalid
