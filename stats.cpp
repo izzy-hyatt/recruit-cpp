@@ -39,14 +39,42 @@ class Stats {
 
 void
 Stats::calculate(const std::vector<int>& data) {
-    // TODO: Implement this method
-    // It should process the input vector and update sum, max, and avg
+    // Process the input vector and update sum, max, and avg
+    for (auto num : data) {
+        this->sum += num;
+        if (num > this->max) {
+            this->max = num;
+        }
+    }
+    this->avg = (double)this->sum / data.size();
 }
 
 int main(int argc, char** argv) {
     std::vector<int> data;
     // Read integers from stdin into data until EOF or invalid input
     // Exit with appropriate message if input is invalid
+    for (std::string line; std::getline(std::cin, line);) {
+        // processed_chars contains the number of chars that have been
+        // converted to an integer. If that number if less than the
+        // length of the string, then some of the chars were not part
+        // of the parsed integer, meaning the input was invalid
+        std::size_t processed_chars = 0;
+        try {
+            int read_char = std::stoi(line, &processed_chars);
+            if (processed_chars != line.size()) {
+                std::cerr << "Line `" << line
+                    << "` contains an invalid integer!" << std::endl;
+                return 1;
+            }
+            data.push_back(read_char);
+        } catch (std::invalid_argument const& _err) {
+            // stoi is the only thing that could be throwing this
+            // exception so we don't need to inspect _err
+            std::cerr << "Line `" << line
+                << "` contains an invalid integer!" << std::endl;
+            return 1;
+        }
+    }
     Stats s(data);
     
     std::cout << "Count: " << data.size() << std::endl;
